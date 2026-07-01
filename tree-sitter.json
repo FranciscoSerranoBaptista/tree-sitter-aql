@@ -1,0 +1,35 @@
+{
+  "grammars": [
+    {
+      "name": "aql",
+      "camelcase": "Aql",
+      "scope": "source.aql",
+      "path": ".",
+      "file-types": [
+        "aql"
+      ],
+      "highlights": "queries/highlights.scm"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT OR Apache-2.0",
+    "description": "Tree-sitter grammar for AQL (ArangoDB / Aquila Query Language)",
+    "links": {
+      "repository": "https://github.com/FranciscoSerranoBaptista/tree-sitter-aql"
+    },
+    "authors": [
+      {
+        "name": "Francisco Serrano Baptista"
+      }
+    ]
+  },
+  "bindings": {
+    "c": true,
+    "go": true,
+    "node": true,
+    "python": true,
+    "rust": true,
+    "swift": true
+  }
+}

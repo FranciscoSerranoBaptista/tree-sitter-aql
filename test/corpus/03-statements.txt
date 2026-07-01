@@ -1,0 +1,814 @@
+==================
+FOR scan: simple collection
+==================
+
+FOR d IN chapters RETURN d
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_scan_spec
+      (identifier)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR scan: bind collection source
+==================
+
+FOR d IN @@coll RETURN d
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_scan_spec
+      (bind_collection)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR scan: array enumeration bind param
+==================
+
+FOR d IN @arr RETURN d
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_scan_spec
+      (bind_parameter)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR scan: with AT clause
+==================
+
+FOR d IN chapters AT '2026-01-01' RETURN d
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_scan_spec
+      (identifier)
+      (string)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR scan: with OPTIONS
+==================
+
+FOR d IN chapters OPTIONS {} RETURN d
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_scan_spec
+      (identifier)
+      (object)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR scan: with AT and OPTIONS
+==================
+
+FOR d IN chapters AT '2026-01-01' OPTIONS {indexHint: 'idx'} RETURN d
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_scan_spec
+      (identifier)
+      (string)
+      (object
+        (object_pair
+          (property_identifier)
+          (string)))))
+  (return_clause
+    (identifier)))
+
+==================
+FOR traversal: v only OUTBOUND named graph
+==================
+
+FOR v IN 1..3 OUTBOUND 'start/1' GRAPH 'g' RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_traversal_spec
+      (binary_expression
+        (integer)
+        (integer))
+      (traversal_direction)
+      (string)
+      (string)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR traversal: v,e INBOUND ad-hoc edge list
+==================
+
+FOR v, e IN 1..2 INBOUND 'start/1' e1, e2 RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (identifier)
+    (for_traversal_spec
+      (binary_expression
+        (integer)
+        (integer))
+      (traversal_direction)
+      (string)
+      (edge_collection_list
+        (identifier)
+        (identifier))))
+  (return_clause
+    (identifier)))
+
+==================
+FOR traversal: AT clause (temporal)
+==================
+
+FOR v IN 1..3 OUTBOUND s GRAPH g AT "2026-01-01" RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_traversal_spec
+      (binary_expression
+        (integer)
+        (integer))
+      (traversal_direction)
+      (identifier)
+      (identifier)
+      (string)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR traversal: PRUNE then AT then OPTIONS
+==================
+
+FOR v, e, p IN 1..3 ANY 'start/1' GRAPH 'g' PRUNE v.deleted AT "2026-01-01" OPTIONS {} RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (identifier)
+    (identifier)
+    (for_traversal_spec
+      (binary_expression
+        (integer)
+        (integer))
+      (traversal_direction)
+      (string)
+      (string)
+      (field_access
+        (identifier)
+        (property_identifier))
+      (string)
+      (object)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR traversal: v,e,p ANY named graph with PRUNE and OPTIONS
+==================
+
+FOR v, e, p IN 1..3 ANY 'start/1' GRAPH 'g' PRUNE v.deleted OPTIONS {} RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (identifier)
+    (identifier)
+    (for_traversal_spec
+      (binary_expression
+        (integer)
+        (integer))
+      (traversal_direction)
+      (string)
+      (string)
+      (field_access
+        (identifier)
+        (property_identifier))
+      (object)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR path: SHORTEST_PATH named graph
+==================
+
+FOR v, e IN SHORTEST_PATH 'a/1' TO 'b/2' OUTBOUND GRAPH 'g' OPTIONS {} RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (identifier)
+    (for_path_spec
+      (string)
+      (string)
+      (traversal_direction)
+      (string)
+      (object)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR path: K_SHORTEST_PATHS named graph
+==================
+
+FOR v IN K_SHORTEST_PATHS 'a/1' TO 'b/2' ANY GRAPH 'g' RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_path_spec
+      (string)
+      (string)
+      (traversal_direction)
+      (string)))
+  (return_clause
+    (identifier)))
+
+==================
+FOR path: K_PATHS ad-hoc edge list
+==================
+
+FOR v IN K_PATHS 'a/1' TO 'b/2' INBOUND e1, e2 RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_path_spec
+      (string)
+      (string)
+      (traversal_direction)
+      (edge_collection_list
+        (identifier)
+        (identifier))))
+  (return_clause
+    (identifier)))
+
+==================
+FOR path: ALL_SHORTEST_PATHS
+==================
+
+FOR v IN ALL_SHORTEST_PATHS 'a/1' TO 'b/2' OUTBOUND GRAPH 'g' RETURN v
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_path_spec
+      (string)
+      (string)
+      (traversal_direction)
+      (string)))
+  (return_clause
+    (identifier)))
+
+==================
+LET clause
+==================
+
+LET x = 1
+
+---
+
+(query
+  (let_clause
+    (identifier)
+    (integer)))
+
+==================
+LET clause with expression
+==================
+
+LET total = a + b * 2
+
+---
+
+(query
+  (let_clause
+    (identifier)
+    (binary_expression
+      (identifier)
+      (binary_expression
+        (identifier)
+        (integer)))))
+
+==================
+FILTER clause
+==================
+
+FILTER x > 0
+
+---
+
+(query
+  (filter_clause
+    (binary_expression
+      (identifier)
+      (integer))))
+
+==================
+SORT single key no direction
+==================
+
+SORT a
+
+---
+
+(query
+  (sort_clause
+    (sort_item
+      (identifier))))
+
+==================
+SORT single key ASC
+==================
+
+SORT a ASC
+
+---
+
+(query
+  (sort_clause
+    (sort_item
+      (identifier))))
+
+==================
+SORT multi-key ASC and DESC
+==================
+
+SORT a ASC, b DESC
+
+---
+
+(query
+  (sort_clause
+    (sort_item
+      (identifier))
+    (sort_item
+      (identifier))))
+
+==================
+SORT by field access
+==================
+
+SORT d.label ASC, d.tier DESC
+
+---
+
+(query
+  (sort_clause
+    (sort_item
+      (field_access
+        (identifier)
+        (property_identifier)))
+    (sort_item
+      (field_access
+        (identifier)
+        (property_identifier)))))
+
+==================
+LIMIT count only
+==================
+
+LIMIT 10
+
+---
+
+(query
+  (limit_clause
+    (integer)))
+
+==================
+LIMIT offset and count
+==================
+
+LIMIT 5, 10
+
+---
+
+(query
+  (limit_clause
+    (integer)
+    (integer)))
+
+==================
+COLLECT WITH COUNT INTO
+==================
+
+COLLECT WITH COUNT INTO total
+
+---
+
+(query
+  (collect_clause
+    (identifier)))
+
+==================
+COLLECT bare key assignment
+==================
+
+COLLECT k = doc.category
+
+---
+
+(query
+  (collect_clause
+    (collect_assignment_list
+      (collect_assignment
+        (identifier)
+        (field_access
+          (identifier)
+          (property_identifier))))))
+
+==================
+COLLECT keys INTO variable
+==================
+
+COLLECT k = doc.category INTO groups
+
+---
+
+(query
+  (collect_clause
+    (collect_assignment_list
+      (collect_assignment
+        (identifier)
+        (field_access
+          (identifier)
+          (property_identifier))))
+    (identifier)))
+
+==================
+COLLECT keys INTO variable KEEP
+==================
+
+COLLECT k = doc.category INTO groups KEEP v1, v2
+
+---
+
+(query
+  (collect_clause
+    (collect_assignment_list
+      (collect_assignment
+        (identifier)
+        (field_access
+          (identifier)
+          (property_identifier))))
+    (identifier)
+    (identifier)
+    (identifier)))
+
+==================
+COLLECT keys WITH COUNT INTO
+==================
+
+COLLECT k = doc.category WITH COUNT INTO total
+
+---
+
+(query
+  (collect_clause
+    (collect_assignment_list
+      (collect_assignment
+        (identifier)
+        (field_access
+          (identifier)
+          (property_identifier))))
+    (identifier)))
+
+==================
+COLLECT keys AGGREGATE
+==================
+
+COLLECT k = doc.category AGGREGATE s = SUM(doc.amount)
+
+---
+
+(query
+  (collect_clause
+    (collect_assignment_list
+      (collect_assignment
+        (identifier)
+        (field_access
+          (identifier)
+          (property_identifier))))
+    (collect_assignment_list
+      (collect_assignment
+        (identifier)
+        (function_call
+          (function_identifier)
+          (field_access
+            (identifier)
+            (property_identifier)))))))
+
+==================
+COLLECT AGGREGATE no keys
+==================
+
+COLLECT AGGREGATE total = COUNT(true)
+
+---
+
+(query
+  (collect_clause
+    (collect_assignment_list
+      (collect_assignment
+        (identifier)
+        (function_call
+          (function_identifier)
+          (boolean))))))
+
+==================
+INSERT INTO collection
+==================
+
+INSERT {name: 'x'} INTO mycoll
+
+---
+
+(query
+  (insert_statement
+    (object
+      (object_pair
+        (property_identifier)
+        (string)))
+    (identifier)))
+
+==================
+INSERT with OPTIONS
+==================
+
+INSERT {name: 'x'} INTO mycoll OPTIONS {overwriteMode: 'update'}
+
+---
+
+(query
+  (insert_statement
+    (object
+      (object_pair
+        (property_identifier)
+        (string)))
+    (identifier)
+    (object
+      (object_pair
+        (property_identifier)
+        (string)))))
+
+==================
+UPDATE WITH IN
+==================
+
+UPDATE {_key: @key} WITH {name: @name} IN mycoll
+
+---
+
+(query
+  (update_statement
+    (object
+      (object_pair
+        (property_identifier)
+        (bind_parameter)))
+    (object
+      (object_pair
+        (property_identifier)
+        (bind_parameter)))
+    (identifier)))
+
+==================
+REPLACE WITH INTO
+==================
+
+REPLACE {_key: @key} WITH {name: 'new'} INTO mycoll
+
+---
+
+(query
+  (replace_statement
+    (object
+      (object_pair
+        (property_identifier)
+        (bind_parameter)))
+    (object
+      (object_pair
+        (property_identifier)
+        (string)))
+    (identifier)))
+
+==================
+REMOVE IN
+==================
+
+REMOVE @key IN mycoll
+
+---
+
+(query
+  (remove_statement
+    (bind_parameter)
+    (identifier)))
+
+==================
+REMOVE with OPTIONS
+==================
+
+REMOVE @key IN mycoll OPTIONS {}
+
+---
+
+(query
+  (remove_statement
+    (bind_parameter)
+    (identifier)
+    (object)))
+
+==================
+UPSERT INSERT UPDATE IN
+==================
+
+UPSERT {name: 'x'} INSERT {name: 'x', count: 1} UPDATE {count: 2} IN mycoll
+
+---
+
+(query
+  (upsert_statement
+    (object
+      (object_pair
+        (property_identifier)
+        (string)))
+    (object
+      (object_pair
+        (property_identifier)
+        (string))
+      (object_pair
+        (property_identifier)
+        (integer)))
+    (object
+      (object_pair
+        (property_identifier)
+        (integer)))
+    (identifier)))
+
+==================
+UPSERT INSERT REPLACE IN
+==================
+
+UPSERT {name: 'x'} INSERT {name: 'x'} REPLACE {name: 'y'} IN mycoll
+
+---
+
+(query
+  (upsert_statement
+    (object
+      (object_pair
+        (property_identifier)
+        (string)))
+    (object
+      (object_pair
+        (property_identifier)
+        (string)))
+    (object
+      (object_pair
+        (property_identifier)
+        (string)))
+    (identifier)))
+
+==================
+full multi-clause query
+==================
+
+FOR d IN chapters FILTER d.tier == 1 SORT d.label ASC LIMIT 5 RETURN d.label
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_scan_spec
+      (identifier)))
+  (filter_clause
+    (binary_expression
+      (field_access
+        (identifier)
+        (property_identifier))
+      (integer)))
+  (sort_clause
+    (sort_item
+      (field_access
+        (identifier)
+        (property_identifier))))
+  (limit_clause
+    (integer))
+  (return_clause
+    (field_access
+      (identifier)
+      (property_identifier))))
+
+==================
+nested FOR with LET and COLLECT
+==================
+
+FOR d IN chapters LET cat = d.category COLLECT k = cat INTO groups RETURN {key: k, docs: groups}
+
+---
+
+(query
+  (for_clause
+    (identifier)
+    (for_scan_spec
+      (identifier)))
+  (let_clause
+    (identifier)
+    (field_access
+      (identifier)
+      (property_identifier)))
+  (collect_clause
+    (collect_assignment_list
+      (collect_assignment
+        (identifier)
+        (identifier)))
+    (identifier))
+  (return_clause
+    (object
+      (object_pair
+        (property_identifier)
+        (identifier))
+      (object_pair
+        (property_identifier)
+        (identifier)))))
+
+==================
+FOR subquery in RETURN position
+==================
+
+RETURN (FOR x IN coll RETURN x)
+
+---
+
+(query
+  (return_clause
+    (subquery
+      (for_clause
+        (identifier)
+        (for_scan_spec
+          (identifier)))
+      (return_clause
+        (identifier)))))
+
+==================
+write statement in subquery
+==================
+
+RETURN (INSERT {name: 'x'} INTO c)
+
+---
+
+(query
+  (return_clause
+    (subquery
+      (insert_statement
+        (object
+          (object_pair
+            (property_identifier)
+            (string)))
+        (identifier)))))

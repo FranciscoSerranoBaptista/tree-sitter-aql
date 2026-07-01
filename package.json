@@ -1,0 +1,28 @@
+{
+  "name": "tree-sitter-aql",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for AQL (ArangoDB / Aquila Query Language)",
+  "repository": "github:FranciscoSerranoBaptista/tree-sitter-aql",
+  "license": "MIT OR Apache-2.0",
+  "author": "Francisco Serrano Baptista",
+  "keywords": [
+    "tree-sitter",
+    "aql",
+    "arangodb",
+    "aquila",
+    "parser",
+    "grammar",
+    "query-language"
+  ],
+  "devDependencies": {
+    "tree-sitter-cli": "^0.26"
+  },
+  "peerDependencies": {
+    "tree-sitter": "^0.26"
+  },
+  "peerDependenciesMeta": {
+    "tree-sitter": {
+      "optional": true
+    }
+  }
+}

@@ -1,0 +1,96 @@
+// --- Clause keywords ---------------------------------------------------------
+
+FOR d IN c RETURN d
+//^ @keyword
+//  ^ @variable
+//    ^ @keyword
+//       ^ @variable
+//         ^ @keyword
+//                ^ @variable
+
+LET x = 1
+//^ @keyword
+//  ^ @variable
+//      ^ @number
+
+FILTER x > 0
+//^ @keyword
+//       ^ @operator
+//         ^ @number
+
+SORT d ASC
+//^ @keyword
+//     ^ @keyword
+
+LIMIT 10
+//^ @keyword
+//    ^ @number
+
+// --- Word operators ----------------------------------------------------------
+
+RETURN a AND b
+//       ^ @keyword
+
+RETURN a OR b
+//       ^ @keyword
+
+RETURN NOT x
+//     ^ @keyword
+
+RETURN a IN b
+//       ^ @keyword
+
+RETURN a LIKE "x%"
+//       ^ @keyword
+//            ^ @string
+
+// --- Literals ----------------------------------------------------------------
+
+RETURN 42
+//     ^ @number
+
+RETURN 3.14
+//     ^ @number
+
+RETURN "hello"
+//     ^ @string
+
+RETURN true
+//     ^ @boolean
+
+RETURN null
+//     ^ @constant.builtin
+
+// --- Bind parameters ---------------------------------------------------------
+
+RETURN @param
+//     ^ @variable.parameter
+
+RETURN @@coll
+//     ^ @variable.parameter
+
+// --- Comments ----------------------------------------------------------------
+
+/* block comment */
+//^ @comment
+
+// --- Traversal direction and quantifier (named nodes) -----------------------
+
+FOR v IN 1..2 OUTBOUND 's/1' GRAPH 'g' RETURN v
+//            ^ @keyword
+//                           ^ @keyword
+
+RETURN vals ALL == 1
+//          ^ @keyword
+//              ^ @operator
+
+// --- Operators ---------------------------------------------------------------
+
+RETURN 1 == 2
+//       ^ @operator
+
+RETURN 1 + 2
+//       ^ @operator
+
+RETURN 1..10
+//       ^ @operator

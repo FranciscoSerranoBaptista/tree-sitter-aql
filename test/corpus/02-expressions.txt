@@ -1,0 +1,331 @@
+==================
+precedence: multiply before add
+==================
+
+RETURN 1 + 2 * 3
+
+---
+
+(query
+  (return_clause
+    (binary_expression
+      (integer)
+      (binary_expression
+        (integer)
+        (integer)))))
+
+==================
+precedence: AND before OR
+==================
+
+RETURN a AND b OR c
+
+---
+
+(query
+  (return_clause
+    (binary_expression
+      (binary_expression
+        (identifier)
+        (identifier))
+      (identifier))))
+
+==================
+prefix NOT
+==================
+
+RETURN NOT x
+
+---
+
+(query
+  (return_clause
+    (unary_expression
+      (identifier))))
+
+==================
+comparison equal
+==================
+
+RETURN a == b
+
+---
+
+(query
+  (return_clause
+    (binary_expression
+      (identifier)
+      (identifier))))
+
+==================
+membership IN
+==================
+
+RETURN a IN b
+
+---
+
+(query
+  (return_clause
+    (binary_expression
+      (identifier)
+      (identifier))))
+
+==================
+membership NOT IN
+==================
+
+RETURN a NOT IN b
+
+---
+
+(query
+  (return_clause
+    (not_in_expression
+      (identifier)
+      (identifier))))
+
+==================
+ternary expression
+==================
+
+RETURN x ? y : z
+
+---
+
+(query
+  (return_clause
+    (ternary_expression
+      (identifier)
+      (identifier)
+      (identifier))))
+
+==================
+elvis expression
+==================
+
+RETURN x ?: y
+
+---
+
+(query
+  (return_clause
+    (elvis_expression
+      (identifier)
+      (identifier))))
+
+==================
+range operator
+==================
+
+RETURN a..b
+
+---
+
+(query
+  (return_clause
+    (binary_expression
+      (identifier)
+      (identifier))))
+
+==================
+function call two args
+==================
+
+RETURN f(1, 2)
+
+---
+
+(query
+  (return_clause
+    (function_call
+      (function_identifier)
+      (integer)
+      (integer))))
+
+==================
+module-qualified function call
+==================
+
+RETURN MODULE::f(1)
+
+---
+
+(query
+  (return_clause
+    (function_call
+      (function_identifier)
+      (function_identifier)
+      (integer))))
+
+==================
+array literal
+==================
+
+RETURN [1, 2, 3]
+
+---
+
+(query
+  (return_clause
+    (array
+      (integer)
+      (integer)
+      (integer))))
+
+==================
+object literal with keyword key
+==================
+
+RETURN { a: 1, "b": 2, for: 3 }
+
+---
+
+(query
+  (return_clause
+    (object
+      (object_pair
+        (property_identifier)
+        (integer))
+      (object_pair
+        (string)
+        (integer))
+      (object_pair
+        (property_identifier)
+        (integer)))))
+
+==================
+field access
+==================
+
+RETURN d.field
+
+---
+
+(query
+  (return_clause
+    (field_access
+      (identifier)
+      (property_identifier))))
+
+==================
+index access
+==================
+
+RETURN d["k"]
+
+---
+
+(query
+  (return_clause
+    (index_access
+      (identifier)
+      (string))))
+
+==================
+single-star expansion
+==================
+
+RETURN d.arr[*]
+
+---
+
+(query
+  (return_clause
+    (expansion
+      (field_access
+        (identifier)
+        (property_identifier)))))
+
+==================
+double-star expansion
+==================
+
+RETURN d.arr[**]
+
+---
+
+(query
+  (return_clause
+    (expansion
+      (field_access
+        (identifier)
+        (property_identifier)))))
+
+==================
+quantifier comparison ALL
+==================
+
+RETURN vals ALL == 1
+
+---
+
+(query
+  (return_clause
+    (quantifier_comparison
+      (identifier)
+      (quantifier)
+      (comparison_operator)
+      (integer))))
+
+==================
+at least comparison — operator preserved in CST
+==================
+
+RETURN vals AT LEAST (2) > 0
+
+---
+
+(query
+  (return_clause
+    (at_least_comparison
+      (identifier)
+      (integer)
+      (comparison_operator)
+      (integer))))
+
+==================
+quantifier NOT IN
+==================
+
+RETURN vals ALL NOT IN b
+
+---
+
+(query
+  (return_clause
+    (quantifier_comparison
+      (identifier)
+      (quantifier)
+      (comparison_operator)
+      (identifier))))
+
+==================
+at least NOT IN
+==================
+
+RETURN vals AT LEAST (2) NOT IN b
+
+---
+
+(query
+  (return_clause
+    (at_least_comparison
+      (identifier)
+      (integer)
+      (comparison_operator)
+      (identifier))))
+
+==================
+subquery expression
+==================
+
+RETURN (RETURN 1)
+
+---
+
+(query
+  (return_clause
+    (subquery
+      (return_clause
+        (integer)))))

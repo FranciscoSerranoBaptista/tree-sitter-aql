@@ -1,0 +1,182 @@
+==================
+return integer
+==================
+
+RETURN 1
+
+---
+
+(query
+  (return_clause
+    (integer)))
+
+==================
+return float
+==================
+
+RETURN 3.14
+
+---
+
+(query
+  (return_clause
+    (float)))
+
+==================
+return double-quoted string
+==================
+
+RETURN "hello"
+
+---
+
+(query
+  (return_clause
+    (string)))
+
+==================
+return single-quoted string
+==================
+
+RETURN 'world'
+
+---
+
+(query
+  (return_clause
+    (string)))
+
+==================
+return null
+==================
+
+RETURN null
+
+---
+
+(query
+  (return_clause
+    (null)))
+
+==================
+return null uppercase
+==================
+
+RETURN NULL
+
+---
+
+(query
+  (return_clause
+    (null)))
+
+==================
+return true
+==================
+
+RETURN true
+
+---
+
+(query
+  (return_clause
+    (boolean)))
+
+==================
+return false
+==================
+
+RETURN false
+
+---
+
+(query
+  (return_clause
+    (boolean)))
+
+==================
+return bind parameter
+==================
+
+RETURN @p
+
+---
+
+(query
+  (return_clause
+    (bind_parameter)))
+
+==================
+return bind collection
+==================
+
+RETURN @@c
+
+---
+
+(query
+  (return_clause
+    (bind_collection)))
+
+==================
+return with identifier
+==================
+
+RETURN doc
+
+---
+
+(query
+  (return_clause
+    (identifier)))
+
+==================
+line comment parses
+==================
+
+// this is a comment
+RETURN 42
+
+---
+
+(query
+  (comment)
+  (return_clause
+    (integer)))
+
+==================
+block comment parses
+==================
+
+/* block comment */ RETURN 99
+
+---
+
+(query
+  (comment)
+  (return_clause
+    (integer)))
+
+==================
+return distinct integer
+==================
+
+RETURN DISTINCT 7
+
+---
+
+(query
+  (return_clause
+    (integer)))
+
+==================
+return lowercase keyword
+==================
+
+return 1
+
+---
+
+(query
+  (return_clause
+    (integer)))

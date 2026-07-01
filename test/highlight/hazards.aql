@@ -1,0 +1,31 @@
+// Hazard highlight tests for AQL grammar.
+//
+// Each case verifies that a keyword-like identifier in a non-keyword
+// syntactic position receives the correct capture rather than @keyword.
+
+// Hazard 1: object key that looks like a keyword -> @property NOT @keyword.
+// The identifier "for" appears as a property_identifier (object key), not a
+// clause keyword.
+RETURN { for: 1 }
+//       ^ @property
+
+// Hazard 2: field access on a keyword-like name -> @property NOT @keyword.
+// "at" is reserved in some contexts but here it is a property_identifier.
+RETURN d.at
+//       ^ @property
+
+// Hazard 3: both tokens of NOT IN are @keyword.
+// "NOT" at col 9 and "IN" at col 13 must both be @keyword.
+RETURN a NOT IN b
+//       ^ @keyword
+//           ^ @keyword
+
+// Hazard 4: function name -> @function NOT @variable.
+// "UPPER" in function-call position is a function_identifier node.
+RETURN UPPER("hello")
+//     ^ @function
+
+// Hazard 5: bind parameter -> @variable.parameter NOT @variable.
+// "@param" is a bind_parameter node; the leading "@" is part of the token.
+RETURN @param
+//     ^ @variable.parameter
