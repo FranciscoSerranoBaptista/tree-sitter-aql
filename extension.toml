@@ -8,4 +8,4 @@ repository = "https://github.com/FranciscoSerranoBaptista/aquila"
 
 [grammars.aql]
 repository = "https://github.com/FranciscoSerranoBaptista/tree-sitter-aql"
-rev = "a15e2cffc0f7cb8cb28e985df40923e2308e8f8b"
+rev = "95ecd57d2d0a884866850a37114ac099daff52a1"
