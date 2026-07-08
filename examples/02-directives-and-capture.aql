@@ -1,0 +1,38 @@
+// Directives & cross-cell state
+// Lines starting with // @ at the top of a cell are kernel directives (they're valid AQL comments).
+// State carries across cells in one binding namespace.
+
+// %% @bind directive
+// @bind — set a persistent bind var, reuse it as @name:
+// @bind: lim = 8
+FOR d IN findings LIMIT @lim RETURN d.label
+
+// %% @into directive
+// @into — capture this cell's rows into a name; reference it later as @name:
+// @into: strong
+FOR d IN findings
+  FILTER d.evidence_strength != null
+  SORT d.evidence_strength DESC
+  LIMIT 10
+  RETURN { label: d.label, strength: d.evidence_strength }
+
+// %% Reference captured rows
+FOR f IN @strong RETURN f.label
+
+// %% @into as query directive
+// @into … as query — capture the query (re-runs live); reference it bare (it's a LET binding, not a bind var):
+// @into: recent as query
+FOR d IN reviews LIMIT 25 RETURN d
+
+// %% Use captured query
+RETURN LENGTH(recent)
+
+// %% @format directive
+// @format — switch the renderer for one cell (table | json | jsonl):
+// @format: json
+FOR d IN resources LIMIT 2 RETURN d
+
+// %% @export directive
+// @export — write the full result to a file (relative paths only — lands in the kernel's working dir):
+// @export: findings.csv as csv
+FOR d IN findings LIMIT 20 RETURN { label: d.label, score: d.completeness_score }

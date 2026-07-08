@@ -1,0 +1,235 @@
+// Witness Arc Research Worksheet
+//
+// Open this file in Zed and run cells with Ctrl-Shift-Enter.
+// This worksheet is intentionally provisional: it lets you research the article
+// now, while making the missing coding surfaces visible.
+//
+// Article claims under test:
+// C1: change sessions follow frustration -> vulnerability -> relief -> recognition
+// C2: AI gives rehearsal/disclosure, not witnessed vulnerability
+// C3: relief without vulnerability produces commitment at about one session in eight
+// C4: vulnerability before recognition produces commitment at about 3x recognition alone
+// C5: repeated arcs compound across months: held -> questioned -> gone
+
+// %% Smoke test
+RETURN {
+  worksheet: "witness-arc-research",
+  status: "ready",
+  note: "Set the collection bind vars in the next cell before running the research cells."
+}
+
+// %% Setup: adjust these collection names to your live Aquila instance
+// @bind: cohort = null
+// @bind: sessions = "coaching_sessions"
+// @bind: eye1 = "eye1_readings"
+// @bind: eye2 = "eye2_readings"
+// @bind: eye6 = "eye6_readings"
+// @bind: session_arcs = "session_arcs"
+// @bind: min_specificity = ["medium", "high"]
+RETURN {
+  cohort: @cohort,
+  sessions: @sessions,
+  eye1: @eye1,
+  eye2: @eye2,
+  eye6: @eye6,
+  session_arcs: @session_arcs,
+  min_specificity: @min_specificity
+}
+
+// %% Denominator: eligible sessions
+// This must be the denominator for article percentages.
+FOR s IN @@sessions
+  FILTER @cohort == null OR s.cohort == @cohort
+  COLLECT WITH COUNT INTO n
+  RETURN {
+    claim_input: "eligible_sessions",
+    denominator: n
+  }
+
+// %% Proxy C1a: frustration language is present
+// Eye 1 supports this proxy through language_used.pattern_type.
+FOR e IN @@eye1
+  FILTER @cohort == null OR e.cohort == @cohort
+  LET markers = (
+    FOR lp IN e.language_used
+      FILTER lp.pattern_type == "frustration_marker"
+      RETURN lp.text
+  )
+  FILTER LENGTH(markers) > 0
+  COLLECT WITH COUNT INTO n
+  RETURN {
+    proxy: "sessions_with_frustration_language",
+    numerator: n
+  }
+
+// %% Proxy C4 outcome: behavioural commitment
+// Stricter variant: add `FILTER a.attribution == "client_self_generated"`.
+// @into: behavioural_commitments
+FOR e IN @@eye2
+  FILTER @cohort == null OR e.cohort == @cohort
+  LET commitments = (
+    FOR a IN e.action_items
+      FILTER a.specificity IN @min_specificity
+      RETURN {
+        description: a.description,
+        attribution: a.attribution,
+        specificity: a.specificity
+      }
+  )
+  FILTER LENGTH(commitments) > 0
+  RETURN {
+    session_key: e.session_key,
+    behavioural_commitment: true,
+    commitments
+  }
+
+// %% Proxy C4 input: recognition
+// This approximates recognition with sacred-cow visibility, but does not prove
+// whether recognition came before or after vulnerability.
+// @into: recognition_proxy
+FOR e IN @@eye1
+  FILTER @cohort == null OR e.cohort == @cohort
+  LET recognized = (
+    FOR cow IN e.sacred_cow_instances
+      FILTER cow.sacred_cow_visibility IN ["emerging", "object"]
+      RETURN cow
+  )
+  FILTER LENGTH(recognized) > 0
+  RETURN {
+    session_key: e.session_key,
+    recognition_proxy: true,
+    recognized_count: LENGTH(recognized)
+  }
+
+// %% Proxy join: recognition sessions with commitment flag
+FOR r IN @recognition_proxy
+  LET committed = LENGTH(
+    FOR c IN @behavioural_commitments
+      FILTER c.session_key == r.session_key
+      RETURN c
+  ) > 0
+  COLLECT committed_bucket = committed ? "recognized_and_committed" : "recognized_no_commitment"
+  WITH COUNT INTO n
+  RETURN {
+    bucket: committed_bucket,
+    sessions: n,
+    caveat: "proxy only; vulnerability ordering is not coded here"
+  }
+
+// %% Target C3: one in eight
+// Requires a materialized session_arcs collection. If this returns an unknown
+// collection error, that is the expected current gap.
+LET eligible = (
+  FOR s IN @@session_arcs
+    FILTER @cohort == null OR s.cohort == @cohort
+    FILTER s.modality IN ["ai", "coaching"]
+    FILTER s.relief_event.present == true
+    FILTER s.vulnerability_event.present == false
+    RETURN s
+)
+LET committed = (
+  FOR s IN eligible
+    FILTER s.behavioural_commitment == true
+    RETURN s
+)
+LET sessions_n = LENGTH(eligible)
+LET commitments_n = LENGTH(committed)
+RETURN {
+  claim: "relief_without_vulnerability_commitment_rate",
+  numerator: commitments_n,
+  denominator: sessions_n,
+  rate: sessions_n == 0 ? null : commitments_n / sessions_n,
+  article_target: "about one session in eight"
+}
+
+// %% Target C4: three times the rate
+// Requires ordered vulnerability and recognition events in session_arcs.
+LET rows = (
+  FOR s IN @@session_arcs
+    FILTER @cohort == null OR s.cohort == @cohort
+    FILTER s.recognition_event.present == true
+    LET bucket = (
+      s.vulnerability_event.present == true
+      AND s.vulnerability_event.order < s.recognition_event.order
+        ? "vulnerability_before_recognition"
+        : "recognition_alone"
+    )
+    RETURN {
+      bucket,
+      behavioural_commitment: s.behavioural_commitment
+    }
+)
+
+FOR bucket IN ["vulnerability_before_recognition", "recognition_alone"]
+  LET bucket_rows = (
+    FOR r IN rows
+      FILTER r.bucket == bucket
+      RETURN r
+  )
+  LET committed = (
+    FOR r IN bucket_rows
+      FILTER r.behavioural_commitment == true
+      RETURN r
+  )
+  LET sessions_n = LENGTH(bucket_rows)
+  LET commitments_n = LENGTH(committed)
+  RETURN {
+    bucket,
+    numerator: commitments_n,
+    denominator: sessions_n,
+    rate: sessions_n == 0 ? null : commitments_n / sessions_n
+  }
+
+// %% C5: sacred-cow trajectory over time
+// Supports "transformation compounds" if visibility/grip moves across sessions.
+FOR e IN @@eye1
+  FILTER @cohort == null OR e.cohort == @cohort
+  FOR cow IN e.sacred_cow_instances
+    FILTER cow.archetype_suggestion != null
+    COLLECT archetype = cow.archetype_suggestion, client = e.client_key INTO rows = {
+      session_key: e.session_key,
+      session_index: e.session_index,
+      visibility: cow.sacred_cow_visibility,
+      grip: cow.sacred_cow_grip
+    }
+    LET ordered = (
+      FOR r IN rows
+        SORT r.session_index ASC
+        RETURN r
+    )
+    FILTER LENGTH(ordered) >= 2
+    LIMIT 50
+    RETURN {
+      client,
+      archetype,
+      trajectory: ordered,
+      caveat: "absence/gone needs an explicit resolution rubric"
+    }
+
+// %% Gap report: what the article still needs before hard quantitative claims
+RETURN [
+  {
+    missing: "vulnerability_event",
+    reason: "distinguishes disclosure from witnessed exposure"
+  },
+  {
+    missing: "relief_event",
+    reason: "separates comfort/regulation from earned relief"
+  },
+  {
+    missing: "recognition_event.kind",
+    reason: "distinguishes acquired recognition from embodied recognition"
+  },
+  {
+    missing: "witness_context",
+    reason: "captures whether another person with stakes received the disclosure"
+  },
+  {
+    missing: "session_arc_step.order",
+    reason: "proves sequence rather than co-occurrence"
+  },
+  {
+    missing: "modality",
+    reason: "supports book vs AI vs coaching vs deeper-work comparison"
+  }
+]

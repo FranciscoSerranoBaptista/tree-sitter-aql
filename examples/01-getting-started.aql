@@ -1,0 +1,19 @@
+// Aquila kernel — getting started
+// Every code cell is AQL. Run a cell with Ctrl-Shift-Enter. Results render as an HTML table.
+// This kernel talks to your local Aquila on :8529 (auth baked into the kernelspec).
+
+// %% Simple arithmetic
+RETURN 1 + 1
+
+// %% First five chapters
+// A real query — first five `chapters` (the embedded full-text research layer):
+FOR d IN chapters
+  LIMIT 5
+  RETURN { label: d.label, chapter: d.chapter_number, tier: d.tier }
+
+// %% Collection size
+// Small reference collection — the transformation arc types:
+RETURN LENGTH(arc_types)
+
+// %% Arc type labels
+FOR a IN arc_types SORT a.label LIMIT 12 RETURN a.label

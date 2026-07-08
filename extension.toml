@@ -1,0 +1,11 @@
+id = "aql"
+name = "AQL"
+version = "0.1.0"
+schema_version = 1
+authors = ["Francisco Serrano Baptista"]
+description = "AQL (ArangoDB / Aquila Query Language) support for Zed."
+repository = "https://github.com/FranciscoSerranoBaptista/aquila"
+
+[grammars.aql]
+repository = "https://github.com/FranciscoSerranoBaptista/tree-sitter-aql"
+rev = "a15e2cffc0f7cb8cb28e985df40923e2308e8f8b"

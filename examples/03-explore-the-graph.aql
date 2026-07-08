@@ -1,0 +1,33 @@
+// Exploring the graph
+// Aggregations, filters, and a traversal template over your real collections.
+
+// %% Chapters by graph domain
+// Count chapters by graph domain:
+FOR d IN chapters
+  COLLECT domain = d.graph_domain WITH COUNT INTO n
+  SORT n DESC
+  RETURN { domain, n }
+
+// %% Findings by status
+// Findings by status:
+FOR d IN findings
+  COLLECT status = d.status WITH COUNT INTO n
+  SORT n DESC
+  RETURN { status, n }
+
+// %% Top pattern types
+// Top chapters pattern types:
+FOR d IN chapters
+  COLLECT pt = d.pattern_type WITH COUNT INTO n
+  SORT n DESC LIMIT 15
+  RETURN { pattern: pt, n }
+
+// %% Traversal template
+// Traversal template — pick a start doc and walk an edge collection (adjust the edge name to your graph; here: evidence edges from a finding):
+FOR start IN findings LIMIT 1
+  FOR v IN 1..1 ANY start._id evidence
+    RETURN DISTINCT v.label
+
+// %% Note on @at directive
+// Note on // @at: — the directive parses today but is a valid-time filter only and a near-no-op on this evergreen corpus;
+// it activates fully once engine issue #594 ships the query-wide options.at. Don't rely on it for reproducibility yet.
