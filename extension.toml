@@ -2,10 +2,10 @@ id = "aql"
 name = "AQL"
 version = "0.1.0"
 schema_version = 1
-authors = ["Francisco Serrano Baptista"]
+authors = ["Francisco Serrano Baptista <noreply@example.com>"]
 description = "AQL (ArangoDB / Aquila Query Language) support for Zed."
 repository = "https://github.com/FranciscoSerranoBaptista/aquila"
 
 [grammars.aql]
 repository = "https://github.com/FranciscoSerranoBaptista/tree-sitter-aql"
-rev = "95ecd57d2d0a884866850a37114ac099daff52a1"
+rev = "b43ae97fbe8855aad2daf7deb95eadd37de882e0"
