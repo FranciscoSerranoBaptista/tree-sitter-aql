@@ -48,8 +48,10 @@ let tree = parser.parse("FOR d IN nodes RETURN d", None).unwrap();
 assert!(!tree.root_node().has_error());
 ```
 
-`tree_sitter_aql::HIGHLIGHTS_QUERY` holds `queries/highlights.scm`, and
-`NODE_TYPES` holds `src/node-types.json`. `cargo test` checks that the
+`tree_sitter_aql::HIGHLIGHTS_QUERY` holds `queries/highlights.scm`,
+`NODE_TYPES` holds `src/node-types.json`, and `KEYWORDS` holds every AQL
+keyword of the grammar, upper case and sorted. `build.rs` generates
+`KEYWORDS` from `src/grammar.json`, so it follows the grammar. `cargo test` checks that the
 grammar loads, that a traversal parses, and that the highlight query
 compiles. The generated parser is ABI 15, so it needs tree-sitter 0.25 or
 later.
