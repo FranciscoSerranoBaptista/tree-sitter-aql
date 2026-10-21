@@ -30,6 +30,30 @@ npx tree-sitter test         # corpus + highlight tests
 
 Requires the tree-sitter CLI `>= 0.26` (generates ABI 15, matching current editors).
 
+## Use from Rust
+
+The crate at the repository root builds `src/parser.c` with `cc` and
+exposes the grammar as a `tree_sitter_language::LanguageFn`:
+
+```toml
+[dependencies]
+tree-sitter = "0.25"
+tree-sitter-aql = { git = "https://github.com/FranciscoSerranoBaptista/tree-sitter-aql" }
+```
+
+```rust
+let mut parser = tree_sitter::Parser::new();
+parser.set_language(&tree_sitter_aql::LANGUAGE.into()).unwrap();
+let tree = parser.parse("FOR d IN nodes RETURN d", None).unwrap();
+assert!(!tree.root_node().has_error());
+```
+
+`tree_sitter_aql::HIGHLIGHTS_QUERY` holds `queries/highlights.scm`, and
+`NODE_TYPES` holds `src/node-types.json`. `cargo test` checks that the
+grammar loads, that a traversal parses, and that the highlight query
+compiles. The generated parser is ABI 15, so it needs tree-sitter 0.25 or
+later.
+
 ## Use in editors
 
 - **Neovim** — add as a custom parser via `nvim-treesitter`.
